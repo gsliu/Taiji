@@ -1,21 +1,52 @@
 var RuleEngine = require('node-rules');
 var FactUtility = require('./sample_fact.json');
 var Rules = require('./rules_cpu.js');
+
 var fs = require('fs')
+//fs.writeFile('./test.json', 'abcd',{
+//                  flag: 'a'
+//               });
+
+/*//fs.mkdirSync('data', 0755);
+fs.open('data/test.json', 'w', 0644, function(e, fd){
+   if(e) throw e;
+   fs.write(fd, "first fs!", 0, 'utf8', function(e){
+      if(e) throw e;
+      fs.closeSync(fd);
+   })
+});
+*/
+
 require('shelljs/global');
 
 if (!which('git')) {
   echo('Sorry, this script requires git');
   exit(1);
 }
-var path = '../VisualEsxtopOnline/server/static/';
-rm('-rf', path + '*.json')
-mkdir(path + 'output');
-// Copy files to release dir
-cd(path + 'data');
 
-// for each .json file, run rules engine to every data and output the issued data
+/*fs.writeFile('./test.json', 'abcd',{
+      flag: 'a'
+   },function(err){
+       if(err) throw err;
+       console.log('----------Done!-----')
+});*/
+
+// Copy files to release dir
+cd('../../VisualEsxtopOnline/server/static/data');
 var res = ls('*.json');
+for(var i=0;i<res.length;i++){
+   /*fs.writeFile('./test.json', 'abcd',{
+      flag: 'a'
+   },function(err){
+       if(err) throw err;
+       console.log('----------Done!-----')
+});*/
+   fs.writeFile('./test.txt', '\nsycn-- '+(new Date()-0), {
+    flag: 'a'
+});
+ 
+}
+
 for(var i = 0; i < res.length; i++){
    //require('shelljs/global');
    //'a'.toEnd('./test.json');
@@ -41,9 +72,10 @@ for(var i = 0; i < res.length; i++){
    var facts = new Array();
    for(var j = 0; j < dataLength; j++){
       var time = pointStart + pointInterval * j;
-      console.log(typeof(time));
+      console.log(pointStart);
       facts[j] = '{"type":"cpu' + '","name":"' + file_name + '","time":"' + time + '","useage":"' + data[j] + '"}';
       facts[j] = JSON.parse(facts[j]);
+//      console.log(facts[j]);
    }
       console.log('---------------');
 
@@ -55,19 +87,24 @@ for(var i = 0; i < res.length; i++){
    // decode the json to get array of each item
    for(var i=0; i < dataLength/20; i++){
       var keys = Object.keys(facts[i])
+      console.log(keys);
       //get the fact value of each item
       switch(facts[i][keys[0]]){
          case "cpu":
             //Now pass the fact on the rule engine for result
             facts[i][keys[2]] = parseInt(facts[i][keys[2]])/100;
+            //require('shelljs/global');
+            //var data = facts[i][keys[2]];
+            //'a'.toEnd('./test.json');
             R.execute(facts[i], function(result){
-              // console.log("The recived para is cpu");
-               if(result.result <=2){
-                  cd('../output');
-                  var output = JSON.stringify(result);
-                  fs.writeFile(file_name + '.json', output, {
-                     flag: 'a'
-                  });
+               console.log("The recived para is cpu");
+               if(result.result == 1){
+                  console.log(result);
+                  console.log(result.reason);
+               }
+               else{
+                  console.log(result);
+                  console.log(result.reason);
                }
 
             });

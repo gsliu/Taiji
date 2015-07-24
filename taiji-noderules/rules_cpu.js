@@ -5,7 +5,7 @@ exports.rules =[{
    },
 
    "consequence": function(R){
-      this.result = false;
+      this.result = 3;
       this.reason = "The CPU used is less than 70%, it works well.(Maybe don't need to warn)\n";
       //if not matched, jump to next rule
       R.next();
@@ -18,7 +18,7 @@ exports.rules =[{
    },
 
    "consequence": function(R){
-      this.result = false;
+      this.result = 2;
       this.reason = "The CPU used is between 70% and 90%\n";
       //if not matched, jump to next rule
       R.stop();
@@ -31,7 +31,7 @@ exports.rules =[{
    },
 
    "consequence": function(R){
-      this.result = false;
+      this.result = 1;
       this.reason = 'Warning!!! The CPU used is upper than 90%!';
       R.stop();//end of the matching work
    }
