@@ -1,7 +1,7 @@
 exports.rules =[{
 
    "condition": function(R){
-      R.when(this.useage < 0.7);
+      R.when(this.useage < 70);
    },
 
    "consequence": function(R){
@@ -14,7 +14,7 @@ exports.rules =[{
    //the second rules
    "name": "warning1",
    "condition": function(R){
-      R.when(this.useage >= 0.7 && this.useage < 0.9);
+      R.when(this.useage >= 70 && this.useage < 90);
    },
 
    "consequence": function(R){
@@ -27,7 +27,7 @@ exports.rules =[{
    //the third rules
    "name": "warning2",
    "condition": function(R){
-      R.when(this.useage >= 0.9);
+      R.when(this.useage >= 90);
    },
 
    "consequence": function(R){

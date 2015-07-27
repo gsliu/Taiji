@@ -9,8 +9,8 @@ if (!which('git')) {
   exit(1);
 }
 var path = '../../VisualEsxtopOnline/server/static/';
-rm('-rf', path + '*.json')
-mkdir(path + 'output');
+//rm('-rf', path + 'output')
+//mkdir(path + 'output');
 // Copy files to release dir
 cd(path + 'data');
 
@@ -24,8 +24,8 @@ for(var i = 0; i < res.length; i++){
    //'a'.toEnd('./test.json');
    var file = res[i];
    var file_name = res[i].replace('.json','');
-   console.log(file_name);
-   if(file_name === "cpu" || file_name === "sample")
+   //console.log(file_name);
+   if(file_name == "cpu" || file_name == "sample")
       continue;
    var path = '../../VisualEsxtopOnline/server/static/data/';
    var file_data = require('./' + path + file);
@@ -48,7 +48,7 @@ for(var i = 0; i < res.length; i++){
       facts[j] = '{"type":"cpu' + '","name":"' + file_name + '","time":"' + time + '","useage":"' + data[j] + '"}';
       facts[j] = JSON.parse(facts[j]);
    }
-      console.log('---------------');
+    //  console.log('---------------');
 
    //define the rules
    var rules =  Rules.rules;
@@ -57,26 +57,35 @@ for(var i = 0; i < res.length; i++){
 
    // decode the json to get array of each item
    //console.log(file_name);
-   for(var j=0; j < dataLength; j++){
-      var keys = Object.keys(facts[j])
+   for(var j=0; j < dataLength/20; j++){
+      //console.log(file_name);
+      var keys = Object.keys(facts[j]);
+      cd('../output');
       //get the fact value of each item
+      //console.log(facts[j][keys[0]]);
       switch(facts[j][keys[0]]){
          case "cpu":
-            console.log(file_name);
+           // console.log('aaaaaaaaaaaa');
             //Now pass the fact on the rule engine for result
             facts[j][keys[2]] = parseInt(facts[j][keys[2]])/100;
+            //if(i == 0)
+            //console.log(facts[j][keys[2]]);
+            console.log(file_name);
+            var re = new Array();
             R.execute(facts[j], function(result){
-              // console.log("The recived para is cpu");
+              // onsole.log("The recived para is cpu");
                if(result.result <=2){
-                  cd('../output');
+                  console.log(result);
                   var output = JSON.stringify(result);
-                  output += output + ','; 
-                  fs.writeFile(file_name + '.json', output, {
+                  output += ',\n';
+                  console.log(output); 
+                  fs.writeFile(result.name + '.json', output, {
                      flag: 'a'
                   });
                }
 
             });
+          console.log('!!!!');
           break;
       }
 
