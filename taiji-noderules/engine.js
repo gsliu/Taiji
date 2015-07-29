@@ -19,7 +19,11 @@ var res = ls('*.json');
 console.log(res);
 for(var i = 0; i < res.length; i++){
    console.log('-----------');
-   console.log(i);
+   console.log(res[i]);
+   fs.writeFile('../output/' + res[i], '[', {
+                     flag: 'a'
+                  });
+
    var file = res[i];
    var file_name = res[i].replace('.json','');
    if(file_name == "cpu" || file_name == "sample")
@@ -42,7 +46,7 @@ for(var i = 0; i < res.length; i++){
    var facts = new Array();
    for(var j = 0; j < dataLength; j++){
       var time = pointStart + pointInterval * j;
-      facts[j] = '{"type":"cpu' + '","name":"' + file_name + '","time":"' + time + '","useage":"' + data[j] + '"}';
+      facts[j] = '{"type": "cpu' + '","name": "' + file_name + '","time": "' + time + '","useage": "' + data[j] + '"}';
       facts[j] = JSON.parse(facts[j]);
    }
 
@@ -52,22 +56,22 @@ for(var i = 0; i < res.length; i++){
    var R = new RuleEngine(rules);
 
    // decode the json to get array of each item
+   cd('../output');
    for(var j=0; j < dataLength/20; j++){
       var keys = Object.keys(facts[j]);
-      cd('../output');
       //get the fact value of each item
       switch(facts[j][keys[0]]){
          case "cpu":
             //Now pass the fact on the rule engine for result
             facts[j][keys[2]] = parseInt(facts[j][keys[2]])/100;
-            console.log(file_name);
+            //console.log(file_name);
             var re = new Array();
             R.execute(facts[j], function(result){
                if(result.result <=2){
-                  console.log(result);
+                  //console.log(result);
                   var output = JSON.stringify(result);
                   output += ',\n';
-                  console.log(output); 
+                  //console.log(result.length); 
                   fs.writeFile(result.name + '.json', output, {
                      flag: 'a'
                   });
@@ -78,5 +82,9 @@ for(var i = 0; i < res.length; i++){
       }
 
    }
+   fs.writeFile(res[i], '{}]', {
+                     flag: 'a'
+                  });
+
 
 }
