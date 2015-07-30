@@ -71,7 +71,7 @@ for(var i = 0; i < res.length; i++){
                   //console.log(result);
                   var output = JSON.stringify(result);
                   output += ',\n';
-                  //console.log(result.length); 
+                  console.log(result.length); 
                   fs.writeFile(result.name + '.json', output, {
                      flag: 'a'
                   });
@@ -82,9 +82,4 @@ for(var i = 0; i < res.length; i++){
       }
 
    }
-   fs.writeFile(res[i], '{}]', {
-                     flag: 'a'
-                  });
-
-
 }

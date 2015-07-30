@@ -7,6 +7,7 @@ app = Flask(__name__)
 def node_rules():
 	#return "hello"
 	a,b = commands.getstatusoutput('node ./taiji-noderules/engine.js')
+        commands.getstatusoutput('./shell.sh')
 	return b
 	#os.system('touch aa')
         #os.system('node ./taiji-noderules/engine.js')
