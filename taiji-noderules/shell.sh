@@ -4,5 +4,5 @@ for k in $(ls)
 do
 	echo "foramting"
 	echo $k
-	sed -i 's/.$/]/' $k
+	sed -i 's/.$/]}/' $k
 done
