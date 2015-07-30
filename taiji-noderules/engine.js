@@ -20,7 +20,7 @@ console.log(res);
 for(var i = 0; i < res.length; i++){
    console.log('-----------');
    console.log(res[i]);
-   fs.writeFile('../output/' + res[i], '{"records":[', {
+   fs.writeFile('../output/' + res[i], '{"records":[ ', {
                      flag: 'a'
                   });
 
