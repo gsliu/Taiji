@@ -8,7 +8,7 @@ if (!which('git')) {
   echo('Sorry, this script requires git');
   exit(1);
 }
-var path = '../../VisualEsxtopOnline/server/static/';
+var path = '../VisualEsxtopOnline/server/static/';
 rm('-rf', path + 'output')
 mkdir(path + 'output');
 // Copy files to release dir
