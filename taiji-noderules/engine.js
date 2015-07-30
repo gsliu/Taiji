@@ -70,7 +70,7 @@ for(var i = 0; i < res.length; i++){
                if(result.result <=2){
                   //console.log(result);
                   var output = JSON.stringify(result);
-                  output += ',\n';
+                  output += ',';
                   console.log(result.length); 
                   fs.writeFile(result.name + '.json', output, {
                      flag: 'a'
