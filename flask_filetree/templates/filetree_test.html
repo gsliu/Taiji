@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="us">
+<head>
+
+   <!-- Basic Page Needs
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title>jquery Filetree test</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Mobile Specific Metas
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FONT
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link hiref='css/fonts.googleapis.css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+
+    <!-- CSS
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/skeleton.css') }}">
+    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/jQueryFileTree.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/jqft-test.css') }}">
+    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/atelier-cave.light.min.css') }}">
+    <!--<link rel="stylesheet" href="css/skeleton.css">
+    <link rel="stylesheet" href="jqueryFileTree.min.css">
+    <link rel="stylesheet" href="css/jqft-test.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/atelier-cave.light.min.css">-->
+
+    <!-- Favicon
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="icon" type="image/png" href="images/1.png" />
+</head>
+
+<!--<script>
+$(document).ready(function(){
+  $("#btn1").click(function(){
+    $('#test').load('/example/jquery/demo_test.txt');
+  })
+})
+</scrip-->
+
+<!--JS-->
+    <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>-->
+    <script src="{{ url_for('filetree.static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('filetree.static', filename='js/highlight.min.js') }}"></script>
+    <script src="{{ url_for('filetree.static', filename='js/jquery.easing.min.js') }}"></script>
+    <script src="{{ url_for('filetree.static', filename='js/jQueryFileTree.js') }}"></script>
+    
+    <script>
+        gPath = "";
+        function MyFileTree() {
+            $("#filetree").fileTree({
+            root: "/",
+            script: "{{ url_for('filetree.sfiles') }}"
+            }, function(file) { 
+                //alert(file);
+                $.post("{{ url_for('filetree.getpath') }}", 
+                    {
+                        'filename' : file
+                    }, 
+                    function(data, status){
+                        $(".editor").text("Editing file " + data);
+                        gPath = data;
+                    });
+                
+                $.post("{{ url_for('filetree.loadfile') }}", 
+                    {
+                        'filename' : file
+                    }, 
+                    function(data, status){
+                        $("#content").text(data)
+                    });
+                });
+                
+            }
+        function initAll(){
+            MyFileTree();
+            document.getElementById("Add").onclick=addFile;
+            document.getElementById("Delete").onclick=deleteFile;
+            document.getElementById("Save").onclick=saveFile;
+        }
+
+        function saveFile(){
+            $(".editor").text('Save file successfully!');
+        }
+
+        function deleteFile(){
+            msg = "Are you sure you want to delete " + gPath + "?";
+            var re = confirm(msg);
+            if(!re){
+                $(".editor").text('Canceled file delete.');
+            }
+            else{
+                $(".editor").text('File deleted.');
+            }
+        }
+
+        function addFile(){
+            var path = prompt("Enter a path you want to add your file:");
+            if (!path)
+                $(".editor").text('Nothing input. Please click Add again and enter a path.');
+            else{
+                $(".editor").text('Add file in path ' + path + ". Please edit it in editor below:");
+                $("#content").text("Edit new file here");
+            }
+        }
+        $(document).ready(initAll);
+      
+    </script>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="twelve columns" id="ha">
+                <h1 class="title"><b>Welcome to Rules Engine Manager System!</b></h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="six columns offset-by-two">
+                <h4>Quick start and easy use</h4>
+                <p>These are some pretty straightforward examples of what you can do with Rules Engine Manager System</p>
+            </div>
+            <div class="four columns">
+                <ul>
+                    <li><a href="#basic-file-tree">Basic File Tree</a></li>
+                    <li><a href="#without-multifolder">Without <b>multiFolder</b></a></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+     
+     <!--the fisrt row-->
+    <div class="row" id="basic-file-tree">
+        <div class="four columns offset-by-one filetree-block">
+            <div class="filetree-title">File in local machine:</div>
+            <div class="jft" id="filetree">
+            <div id="filetree"></div>
+            </div>
+            <div class="filetree-multiFolder-off"></div>
+        </div>
+
+        <div class="six columns info-block">
+            <div>
+                <div class="buttons">
+                    <form action="#">
+                        <input type="button" id="Add" value="Add">
+                        <input type="button" id="Delete" value="Delete">
+                        <input type="button" id="Save" value="Save">
+                    </form>
+                </div>
+                <div class="editor"></div>
+
+                <div class="selected-file"></div>
+                <pre>
+                    <textarea class="javascript hljs" id="content" style="height:247px;width:534px">
+                      Please click the file you want...
+                    </textarea>
+                </pre>
+                
+            </div>
+        </div>
+    </div>
+
+    
+</body>
+</html>

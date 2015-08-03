@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="us">
+<head>
+
+   <!-- Basic Page Needs
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title>jquery Filetree test</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Mobile Specific Metas
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FONT
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link hiref='css/fonts.googleapis.css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+
+    <!-- CSS
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/skeleton.css') }}">
+    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/jQueryFileTree.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/jqft-test.css') }}">
+    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/atelier-cave.light.min.css') }}">
+    <link href="{{ url_for('filetree.static', filename='css/jqueryFileTree.css') }}" rel="stylesheet"></link>
+    <!--<link rel="stylesheet" href="css/skeleton.css">
+    <link rel="stylesheet" href="jqueryFileTree.min.css">
+    <link rel="stylesheet" href="css/jqft-test.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/atelier-cave.light.min.css">-->
+
+    <!-- Favicon
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="icon" type="image/png" href="images/1.png" />
+</head>
+
+<!--<script>
+$(document).ready(function(){
+  $("#btn1").click(function(){
+    $('#test').load('/example/jquery/demo_test.txt');
+  })
+})
+</scrip-->
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="twelve columns">
+                <h1 class="title"><b>Welcome to Rules Engine Manager System!</b></h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="six columns offset-by-two">
+                <h4>Quick start and easy use</h4>
+                <p>These are some pretty straightforward examples of what you can do with Rules Engine Manager System</p>
+            </div>
+            <div class="four columns">
+                <ul>
+                    <li><a href="#basic-file-tree">Basic File Tree</a></li>
+                    <li><a href="#without-multifolder">Without <b>multiFolder</b></a></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+     
+     <!--the fisrt row-->
+    <div class="row" id="basic-file-tree">
+        <div class="four columns offset-by-one filetree-block">
+            <div class="filetree-title">File in local machine:</div>
+            <div class="jft" id="filetree">
+                <script src="{{ url_for('filetree.static', filename='js/jquery.js') }}"></script>
+                <script src="{{ url_for('filetree.static', filename='js/jqueryFileTree.js') }}"></script>
+                <style> 
+                </style>
+                <script>
+                    $(function() {
+                        $("#filetree").fileTree({
+                        root: "/",
+                        script: "{{ url_for('filetree.sfiles') }}"
+                        }, function(file) { 
+                            //alert(file);
+                            //$('.selected-file').text( $('a[rel="'+file+'"]').text() );
+                            // $.get(file, function(data){
+                            //     alert(data);
+                            // });
+                        });
+                    });
+                </script>
+                <div id="filetree"></div>
+            </div>
+            <div class="filetree-multiFolder-off"></div>
+        </div>
+
+        <div class="six columns info-block">
+            <div>
+                <div class="selected-file"></div>
+                <pre>
+                    <textarea class="javascript hljs" style="height:247px;width:534px">
+                      Please input something...
+                    </textarea>
+                </pre>
+                <p>testing</p>
+            </div>
+        </div>
+    </div>
+    <!--JS-->
+    <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>-->
+    <!--<<script src="{{ url_for('filetree.static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('filetree.static', filename='js/highlight.min.js') }}"></script>
+    <script src="{{ url_for('filetree.static', filename='js/jquery.easing.min.js') }}"></script>-->
+    <script>
+        
+    </script>
+    
+</body>
+</html>
