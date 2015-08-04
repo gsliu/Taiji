@@ -1,95 +1,193 @@
-// jQuery File Tree Plugin
-//
-// Version 1.01
-//
-// Cory S.N. LaViska
-// A Beautiful Site (http://abeautifulsite.net/)
-// 24 March 2008
-//
-// Visit http://abeautifulsite.net/notebook.php?article=58 for more information
-//
-// Usage: $('.fileTreeDemo').fileTree( options, callback )
-//
-// Options:  root           - root folder to display; default = /
-//           script         - location of the serverside AJAX file to use; default = jqueryFileTree.php
-//           folderEvent    - event to trigger expand/collapse; default = click
-//           expandSpeed    - default = 500 (ms); use -1 for no animation
-//           collapseSpeed  - default = 500 (ms); use -1 for no animation
-//           expandEasing   - easing function to use on expand (optional)
-//           collapseEasing - easing function to use on collapse (optional)
-//           multiFolder    - whether or not to limit the browser to one subfolder at a time
-//           loadMessage    - Message to display while initial tree loads (can be HTML)
-//
-// History:
-//
-// 1.01 - updated to work with foreign characters in directory/file names (12 April 2008)
-// 1.00 - released (24 March 2008)
-//
-// TERMS OF USE
-// 
-// This plugin is dual-licensed under the GNU General Public License and the MIT License and
-// is copyright 2008 A Beautiful Site, LLC. 
-//
-if(jQuery) (function($){
-	
-	$.extend($.fn, {
-		fileTree: function(o, h) {
-			// Defaults
-			if( !o ) var o = {};
-			if( o.root == undefined ) o.root = '/';
-			if( o.script == undefined ) o.script = 'jqueryFileTree.php';
-			if( o.folderEvent == undefined ) o.folderEvent = 'click';
-			if( o.expandSpeed == undefined ) o.expandSpeed= 500;
-			if( o.collapseSpeed == undefined ) o.collapseSpeed= 500;
-			if( o.expandEasing == undefined ) o.expandEasing = null;
-			if( o.collapseEasing == undefined ) o.collapseEasing = null;
-			if( o.multiFolder == undefined ) o.multiFolder = true;
-			if( o.loadMessage == undefined ) o.loadMessage = 'Loading...';
-			
-			$(this).each( function() {
-				
-				function showTree(c, t) {
-					$(c).addClass('wait');
-					$(".jqueryFileTree.start").remove();
-					$.post(o.script, { dir: t }, function(data) {
-						$(c).find('.start').html('');
-						$(c).removeClass('wait').append(data);
-						if( o.root == t ) $(c).find('UL:hidden').show(); else $(c).find('UL:hidden').slideDown({ duration: o.expandSpeed, easing: o.expandEasing });
-						bindTree(c);
-					});
-				}
-				
-				function bindTree(t) {
-					$(t).find('LI A').bind(o.folderEvent, function() {
-						if( $(this).parent().hasClass('directory') ) {
-							if( $(this).parent().hasClass('collapsed') ) {
-								// Expand
-								if( !o.multiFolder ) {
-									$(this).parent().parent().find('UL').slideUp({ duration: o.collapseSpeed, easing: o.collapseEasing });
-									$(this).parent().parent().find('LI.directory').removeClass('expanded').addClass('collapsed');
-								}
-								$(this).parent().find('UL').remove(); // cleanup
-								showTree( $(this).parent(), escape($(this).attr('rel').match( /.*\// )) );
-								$(this).parent().removeClass('collapsed').addClass('expanded');
-							} else {
-								// Collapse
-								$(this).parent().find('UL').slideUp({ duration: o.collapseSpeed, easing: o.collapseEasing });
-								$(this).parent().removeClass('expanded').addClass('collapsed');
-							}
-						} else {
-							h($(this).attr('rel'));
-						}
-						return false;
-					});
-					// Prevent A from triggering the # on non-click events
-					if( o.folderEvent.toLowerCase != 'click' ) $(t).find('LI A').bind('click', function() { return false; });
-				}
-				// Loading message
-				$(this).html('<ul class="jqueryFileTree start"><li class="wait">' + o.loadMessage + '<li></ul>');
-				// Get the initial file list
-				showTree( $(this), escape(o.root) );
-			});
-		}
-	});
-	
-})(jQuery);
+
+/*
+  * jQueryFileTree Plugin
+  *
+  * @author - Cory S.N. LaViska - A Beautiful Site (http://abeautifulsite.net/) - 24 March 2008
+  * @author - Dave Rogers - https://github.com/daverogers/jQueryFileTree
+  *
+  * Usage: $('.fileTreeDemo').fileTree({ options }, callback )
+  *
+  * TERMS OF USE
+  *
+  * This plugin is dual-licensed under the GNU General Public License and the MIT License and
+  * is copyright 2008 A Beautiful Site, LLC.
+ */
+(function($, window) {
+  var FileTree;
+  FileTree = (function() {
+    function FileTree(el, args, callback) {
+      var $el, defaults;
+      $el = $(el);
+      defaults = {
+        root: '/',
+        script: '/files/filetree',
+        folderEvent: 'click',
+        expandSpeed: 500,
+        collapseSpeed: 500,
+        expandEasing: 'swing',
+        collapseEasing: 'swing',
+        multiFolder: true,
+        loadMessage: 'Loading...',
+        errorMessage: 'Unable to get file tree information',
+        multiSelect: false,
+        onlyFolders: false,
+        onlyFiles: false
+      };
+      this.jqft = {
+        container: $el
+      };
+      this.options = $.extend(defaults, args);
+      this.callback = callback;
+      $el.html('<ul class="jqueryFileTree start"><li class="wait">' + this.options.loadMessage + '<li></ul>');
+      this.showTree($el, escape(this.options.root));
+    }
+
+    FileTree.prototype.showTree = function(el, dir) {
+      var $el, _this, data, options;
+      $el = $(el);
+      options = this.options;
+      _this = this;
+      $el.addClass('wait');
+      $(".jqueryFileTree.start").remove();
+      data = {
+        dir: dir,
+        onlyFolders: options.onlyFolders,
+        onlyFiles: options.onlyFiles,
+        multiSelect: options.multiSelect
+      };
+      return $.ajax({
+        url: options.script,
+        type: 'POST',
+        dataType: 'HTML',
+        data: data
+      }).done(function(result) {
+        var li;
+        $el.find('.start').html('');
+        $el.removeClass('wait').append(result);
+        if (options.root === dir) {
+          $el.find('UL:hidden').show(typeof callback !== "undefined" && callback !== null);
+        } else {
+          if (jQuery.easing[options.expandEasing] === void 0) {
+            console.log('Easing library not loaded. Include jQueryUI or 3rd party lib.');
+            options.expandEasing = 'swing';
+          }
+          $el.find('UL:hidden').slideDown({
+            duration: options.expandSpeed,
+            easing: options.expandEasing
+          });
+        }
+        li = $('[rel="' + decodeURIComponent(dir) + '"]').parent();
+        if (options.multiSelect && li.children('input').is(':checked')) {
+          li.find('ul li input').each(function() {
+            $(this).prop('checked', true);
+            return $(this).parent().addClass('selected');
+          });
+        }
+        return _this.bindTree($el);
+      }).fail(function() {
+        $el.find('.start').html('');
+        $el.removeClass('wait').append("<p>" + options.errorMessage + "</p>");
+        return false;
+      });
+    };
+
+    FileTree.prototype.bindTree = function(el) {
+      var $el, _this, callback, jqft, options, relPattern;
+      $el = $(el);
+      options = this.options;
+      jqft = this.jqft;
+      _this = this;
+      callback = this.callback;
+      relPattern = /^\/.*\/$/i;
+      $el.find('LI A').on(options.folderEvent, function() {
+        var data, ref;
+        data = {};
+        data.li = $(this).closest('li');
+        data.type = (ref = data.li.hasClass('directory')) != null ? ref : {
+          'directory': 'file'
+        };
+        data.value = $(this).text();
+        data.rel = $(this).prop('rel');
+        data.container = jqft.container;
+        if ($(this).parent().hasClass('directory')) {
+          if ($(this).parent().hasClass('collapsed')) {
+            _this._trigger($(this), 'filetreeexpand', data);
+            if (!options.multiFolder) {
+              $(this).parent().parent().find('UL').slideUp({
+                duration: options.collapseSpeed,
+                easing: options.collapseEasing
+              });
+              $(this).parent().parent().find('LI.directory').removeClass('expanded').addClass('collapsed');
+            }
+            $(this).parent().removeClass('collapsed').addClass('expanded');
+            $(this).parent().find('UL').remove();
+            jqft.container.find('li').removeClass('selected');
+            $(this).parent().addClass('selected');
+
+            _this.showTree($(this).parent(), $(this).attr('rel').match(relPattern)[0]);
+            _this._trigger($(this), 'filetreeexpanded', data);
+
+            if (typeof callback === "function") {
+              callback($(this).attr('rel'));
+          }
+          } else {
+            _this._trigger($(this), 'filetreecollapse', data);
+            $(this).parent().find('UL').slideUp({
+              duration: options.collapseSpeed,
+              easing: options.collapseEasing
+            });
+            $(this).parent().removeClass('expanded').addClass('collapsed');
+            _this._trigger($(this), 'filetreecollapsed', data);
+          }
+        } else {
+          if (!options.multiSelect) {
+            jqft.container.find('li').removeClass('selected');
+            $(this).parent().addClass('selected');
+          } else {
+            if ($(this).parent().find('input').is(':checked')) {
+              $(this).parent().find('input').prop('checked', false);
+              $(this).parent().removeClass('selected');
+            } else {
+              $(this).parent().find('input').prop('checked', true);
+              $(this).parent().addClass('selected');
+            }
+          }
+          _this._trigger($(this), 'filetreeclicked', data);
+          if (typeof callback === "function") {
+            callback($(this).attr('rel'));
+          }
+        }
+        return false;
+      });
+      if (options.folderEvent.toLowerCase !== 'click') {
+        return $el.find('LI A').on('click', function() {
+          return false;
+        });
+      }
+    };
+
+    FileTree.prototype._trigger = function(el, eventType, data) {
+      var $el;
+      $el = $(el);
+      return $el.trigger(eventType, data);
+    };
+
+    return FileTree;
+
+  })();
+  return $.fn.extend({
+    fileTree: function(args, callback) {
+      return this.each(function() {
+        var $this, data;
+        $this = $(this);
+        data = $this.data('fileTree');
+        if (!data) {
+          $this.data('fileTree', (data = new FileTree(this, args, callback)));
+        }
+        if (typeof args === 'string') {
+          return data[option].apply(data);
+        }
+      });
+    }
+  });
+})(window.jQuery, window);

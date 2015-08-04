@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-
+from flask import Flask,request
 import logging
 import os
 import urllib
 
 import flask
-
+import shutil
+import requests
 
 def get_files(d, fnfilter, dfilter, rel=True):
     d = os.path.expanduser(d)
@@ -74,6 +75,54 @@ def make_blueprint(app=None, register=True, fnfilter=None, dfilter=None):
     @filetree.route('/test')
     def test():
         return flask.render_template('filetree_test.html')
+
+    @filetree.route('/deletefile')
+    def deletefile():
+        if request.method == 'GET':
+            path = request.values['path']
+            if path and os.path.exists(path):
+                if os.path.isfile(path):
+                    os.remove(path)
+                if os.path.isdir(path):
+                    shutil.rmtree(path)
+                return flask.render_template('filetree_test.html')
+        return flask.render_template('filetree_test.html')
+
+    @filetree.route('/newfile')
+    def newfile():
+        if request.method == 'GET':
+            filepath = request.values['filepath']
+            filename = request.values['filename']
+            if filepath and filename and not os.path.exists(filepath+filename):
+                if os.path.isfile(filepath):
+                    filepath1, filepath2 = os.path.split(filepath)
+                    f = open(filepath1 +'/'+ filename, 'w')
+                if os.path.isdir(filepath):
+                    f = open(filepath + filename, 'w')
+                f.close()
+                return flask.render_template('filetree_test.html')
+        return flask.render_template('filetree_test.html')
+
+    @filetree.route('/newfolder')
+    def newfolder():
+        if request.method == 'GET':
+            filepath = request.values['filepath']
+            filename = request.values['filename']
+            if filepath and filename:
+                if os.path.isfile(filepath):
+                    filepath1, filepath2 = os.path.split(filepath)
+                    if not os.path.exists(filepath1 +'/'+ filename):
+                        os.makedirs(filepath1 +'/'+ filename)
+                if os.path.isdir(filepath):
+                    if not os.path.exists(filepath + filename):                    
+                        os.makedirs(filepath + filename)
+                return flask.render_template('filetree_test.html')
+        return flask.render_template('filetree_test.html')
+
+
+    @filetree.route('/demo')
+    def demo():
+        return flask.render_template('demo.html')
 
     @filetree.route('/noderule')
     def noderule():

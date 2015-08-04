@@ -6,19 +6,158 @@
     <link href="{{ url_for('filetree.static', filename='css/jqueryFileTree.css') }}" rel="stylesheet"></link>
     <script src="{{ url_for('filetree.static', filename='js/jquery.js') }}"></script>
     <script src="{{ url_for('filetree.static', filename='js/jqueryFileTree.js') }}"></script>
+
+    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/skeleton.min.css') }}"></link>
+    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/jqft-test.css') }}"></link>
+    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/atelier-cave.light.min.css') }}"></link>
+    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/prettify.css') }}"></link>
+    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/codemirror.css') }}"></link>
+<!--    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/styles/default.css') }}"></link> -->   
+    <script src="{{ url_for('filetree.static', filename='js/highlight.min.js') }}"></script>
+    <script src="{{ url_for('filetree.static', filename='js/run_prettify.js') }}"></script>
+    <script src="{{ url_for('filetree.static', filename='js/codemirror.js') }}"></script>
+    <script src="{{ url_for('filetree.static', filename='js/javascript.js') }}"></script>
+
     <style>
     </style>
     <script>
+
+        var filepath;
+        function setfilepath(file){filepath=file};
+        function addfile()
+        {
+          if(!filepath){
+            alert("no defined way"); 
+            return
+            }
+          var filename=prompt("filename","newfile.js")
+
+          if (filename!=null && filename!="")
+            {
+                window.location.href="/filetree/newfile?filepath="+filepath+"&&filename="+filename
+            }
+        
+        }
+
+        function addfolder() 
+        {
+          if(!filepath){
+            alert("no defined way"); 
+            return
+            }
+          var filename=prompt("foldername","newfolder")
+
+          if (filename!=null && filename!="")
+            {
+                window.location.href="/filetree/newfolder?filepath="+filepath+"&&filename="+filename
+            }
+
+        }
+
+
+        function deletefile(filepath){
+            if(!filepath)
+                alert("no path")
+            else 
+                window.location.href="/filetree/deletefile?path="+filepath
+        };
+
         $(function() {
             $("#filetree").fileTree({
-                root: "~",
-                script: "{{ url_for('filetree.sfiles') }}"
-            }, function(file) { alert(file); });
+                root: "/Users/tiddy/Documents/git/Taiji/flask_filetree/rule",
+                script: "{{ url_for('filetree.sfiles') }}",
+                folderEvent: "click"
+            }, function(file) { setfilepath(file)});
         });
     </script>
 </head>
 <body>
-    <div id="filetree">
-    </div>
+    <div class="container">
+        <div class="row">
+            <div class="twelve columns">
+                <h1 class="title"><b>jQueryFileTree Demo</b></h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="six columns offset-by-two">
+                <h4>Example Use Cases</h4>
+                <p>These are some pretty straightforward examples of what you can do with jQueryFileTree</p>
+            </div>
+            <div class="four columns">
+                <ul>
+                    <li><a href="#basic-file-tree">Basic File Tree</a></li>
+                    <li><a href="#without-multifolder">Without <b>multiFolder</b></a></li>
+                    <li><a href="#folders-only">Folders Only</a></li>
+                    <li><a href="#custom-easing">Custom Easing</a></li>
+                    <li><a href="#multiselect">Multiselect</a></li>
+                    <li><a href="#events">Events</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- BASIC FILE TREE -->
+        <div class="row" id="basic-file-tree">
+            <div class="four columns offset-by-one filetree-block">
+                <div class="filetree-basic">
+                    <div id="filetree">
+                    </div>
+                </div>
+                <div class="filetree-multiFolder-off"></div>
+            </div>
+            <div class="six columns info-block">
+                <div><button onclick="addfile()">New file</button><div><button onclick="addfolder()">New folder</button><button>Save</button><button onclick="deletefile(filepath)">delete</button> </div>
+                <div>
+                    <h4>Basic File Tree</h4>
+                </div>
+
+                    <pre><textarea id="myTextArea">
+
+
+
+var RuleEngine = require('../index');
+/* Sample Rule to block a transaction if its below 500 */
+var rule = {
+    "condition": function(R) {
+        R.when(this.transactionTotal < 500);
+    },
+    "consequence": function(R) {
+        this.result = false;
+        this.reason = "The transaction was blocked as it was less than 500";
+        R.stop();
+    }
+};
+/* Creating Rule Engine instance and registering rule */
+var R = new RuleEngine();
+R.register(rule);
+/* Fact with less than 500 as transaction, and this should be blocked */
+var fact = {
+    "name": "user4",
+    "application": "MOB2",
+    "transactionTotal": 400,
+    "cardType": "Credit Card"
+};
+R.execute(fact, function(data) {
+    if (data.result) {
+        console.log("Valid transaction");
+    } else {
+        console.log("Blocked Reason:" + data.reason);
+    }
+});
+
+
+
+                    </textarea></pre>
+                </div>
+            </div>
+        </div>
+    <script type="text/javascript">
+ //   function settextarea()
+ //   {
+ //       document.getElemengtById("highlight").get
+ //   }
+var myCodeMirror = CodeMirror.fromTextArea(myTextArea);
+</script>
+</div>
 </body>
 </html>
