@@ -34,9 +34,11 @@ def get_file_content(filename):
             content.append(line)
     return content
 
+
 def save_file_content(filename, content):
     with open(filename, 'w') as f:
         f.write(content)
+
 
 def make_blueprint(app=None, register=True, fnfilter=None, dfilter=None):
     if fnfilter is None:
