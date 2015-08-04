@@ -23,12 +23,16 @@ fs.writeFile('../output/logs.json', '{"records":[ ', {
                      flag: 'a'
                   });
 
+fs.writeFile('../output/cpu.json', '{"records":[ ', {
+                     flag: 'a'
+                  });
+fs.writeFile('../output/memory.json', '{"records":[ ', {
+                     flag: 'a'
+                  });
+
 for(var i = 0; i < res.length; i++){
    console.log('-----------');
    console.log(res[i]);
-   fs.writeFile('../output/' + res[i], '{"records":[ ', {
-                     flag: 'a'
-                  });
    
    var file = res[i];
    var file_name = res[i].replace('.json','');
@@ -46,10 +50,20 @@ for(var i = 0; i < res.length; i++){
    var facts = new Array();
    for(var j = 0; j < dataLength; j++){
       var time = pointStart + pointInterval * j;
-      if(file_name.indexOf('cpu')>=0)
-         facts[j] = '{"level": 0, "type": "cpu' + '","name": "' + file_name + '","time": "' + time + '","useage": "' + data[j] + '%"}';
-      else if(file_name.indexOf('memory')>=0)
-         facts[j] = '{"level": 0, "type": "memory' + '","name": "' + file_name + '","time": "' + time + '","useage": "' + data[j] + '"}';
+      var name = "";
+      var type = "";
+      if(file_name.indexOf('cpu')>=0){
+         type = "cpu";
+         if(file_name.indexOf('1')>=0)
+	    name = "cpu2"
+         else
+            name = "cpu1"
+         facts[j] = '{"level": 0, "type": "' + type  + '","name": "' + name + '","time": "' + time + '","useage": "' + data[j] + '%"}';
+      }
+      else if(file_name.indexOf('memory')>=0){
+         type = "memory";
+         facts[j] = '{"level": 0, "type": "' + type + '","name": "' + file_name + '","time": "' + time + '","useage": "' + data[j] + '"}';
+      }
       else{
 	}
       facts[j] = JSON.parse(facts[j]);
@@ -64,24 +78,25 @@ for(var i = 0; i < res.length; i++){
 
    // decode the json to get array of each item
    cd('../output');
-   for(var j=0; j < dataLength/20; j++){
+   for(var j=0; j < dataLength; j++){
       var keys = Object.keys(facts[j]);
       //get the fact value of each item
       switch(facts[j][keys[1]]){
          case "cpu":
             //Now pass the fact on the rule engine for result
-            facts[j][keys[3]] = parseInt(facts[j][keys[3]])/100;
+            facts[j][keys[4]] = parseInt(facts[j][keys[4]]);
             //console.log(file_name);
             var re = new Array();
+            //console.log(facts[j]);
             R_cpu.execute(facts[j], function(result){
-               if(result.result <=2){
+               if(result.result<=2){
                   //console.log(result);
 		  result["level"] = result["result"];
                   delete result["result"];
                   var output = JSON.stringify(result);
                   output += ',';
                   console.log(result);
-                  fs.writeFile(result.name + '.json', output, {
+                  fs.writeFile('cpu.json', output, {
                      flag: 'a'
                   });
                   fs.writeFile('logs.json', output,{
@@ -93,18 +108,18 @@ for(var i = 0; i < res.length; i++){
           break;
 	case "memory":
 	    //Now pass the fact on the rule engine for result
-            facts[j][keys[3]] = parseInt(facts[j][keys[3]])/100;
+            facts[j][keys[3]] = parseInt(facts[j][keys[3]]);
             //console.log(file_name);
             var re = new Array();
             R_memory.execute(facts[j], function(result){
                if(result.result <=2){
-                  //console.log(result);
+                  //console.log(typeof(result.result));
                   result["level"] = result["result"];
                   delete result["result"];
                   var output = JSON.stringify(result);
                   output += ',';
-                  console.log(result);
-                  fs.writeFile(result.name + '.json', output, {
+                  //console.log(result);
+                  fs.writeFile('memory.json', output, {
                      flag: 'a'
                   });
                   fs.writeFile('logs.json', output,{
