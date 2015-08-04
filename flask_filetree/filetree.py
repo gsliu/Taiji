@@ -12,6 +12,7 @@ def get_files(d, fnfilter, dfilter, rel=True):
     d = os.path.expanduser(d)
     dirs = []
     fns = []
+    path = []
     for fn in sorted(os.listdir(d)):
         ffn = os.path.join(d, fn)
         if not rel:
@@ -19,11 +20,23 @@ def get_files(d, fnfilter, dfilter, rel=True):
         if os.path.isdir(ffn):
             if dfilter(ffn):
                 dirs.append(fn)
+                print d + "( folder)"
         else:
+            print d + " (file)"
             if fnfilter(ffn):
                 fns.append(fn)
     return fns, dirs
 
+def get_file_content(filename):
+    content = []
+    with open(filename, 'r') as f:
+        for line in f.readlines():
+            content.append(line)
+    return content
+
+def save_file_content(filename, content):
+    with open(filename, 'w') as f:
+        f.write(content)
 
 def make_blueprint(app=None, register=True, fnfilter=None, dfilter=None):
     if fnfilter is None:
@@ -55,7 +68,8 @@ def make_blueprint(app=None, register=True, fnfilter=None, dfilter=None):
     def sfiles():
         r = []
         try:
-            d = urllib.unquote(flask.request.form.get('dir', './'))
+            d = urllib.unquote(flask.request.form.get('dir', '/'))
+            print d
             fns, dirs = get_files(d, fnfilter, dfilter, rel=True)
             r = ['<ul class="jqueryFileTree" style="display: none;">']
             for f in dirs:
@@ -72,9 +86,36 @@ def make_blueprint(app=None, register=True, fnfilter=None, dfilter=None):
             r.append('Could not load directory: %s' % (str(E)))
         return ''.join(r)
 
-    @filetree.route('/test')
-    def test():
-        return flask.render_template('filetree_test.html')
+    @filetree.route('/getFolder', methods=['POST'])
+    def getFolder():
+        print "getFolder"
+        r = []
+        try:
+            d = urllib.unquote(flask.request.form.get('dir', '/'))
+            r = get_folder(d, fnfilter, dfilter, rel=True)
+        except Exception as E:
+            r.append('Could not load directory: %s' % (str(E)))
+        return ''.join(r)
+
+    @filetree.route('/getpath', methods=['POST'])
+    def getpath():
+        print "getpath"
+        filename = flask.request.form.get('filename')
+        return '\n'.join(filename)
+
+    @filetree.route('/loadfile', methods=['POST'])
+    def loadfile():
+        filename = flask.request.form.get('filename')
+        content = get_file_content(filename)
+        return '\n'.join(content)
+
+    @filetree.route('/savefile', methods=['POST'])
+    def savefile():
+        filename = flask.request.form.get('filename')
+        content = flask.request.form.get('content')
+        save_file_content(filename, content)
+        print filename, content
+        return "Save Done!"
 
     @filetree.route('/deletefile')
     def deletefile():
@@ -120,9 +161,10 @@ def make_blueprint(app=None, register=True, fnfilter=None, dfilter=None):
         return flask.render_template('filetree_test.html')
 
 
-    @filetree.route('/demo')
-    def demo():
-        return flask.render_template('demo.html')
+
+    @filetree.route('/test')
+    def test():
+        return flask.render_template('filetree_test.html')
 
     @filetree.route('/noderule')
     def noderule():

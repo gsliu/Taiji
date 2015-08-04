@@ -2,7 +2,7 @@
 <html lang="us">
 <head>
 	<meta charset="utf-8">
-    <title>jquery Filetree test</title>
+    <title>Rules Engine Manager System</title>
     <link href="{{ url_for('filetree.static', filename='css/jqueryFileTree.css') }}" rel="stylesheet"></link>
     <script src="{{ url_for('filetree.static', filename='js/jquery.js') }}"></script>
     <script src="{{ url_for('filetree.static', filename='js/jqueryFileTree.js') }}"></script>
@@ -21,13 +21,51 @@
     <style>
     </style>
     <script>
-
+        // CodeMirror.fromTextArea($("#content"));
+        var editor;
         var filepath;
         function setfilepath(file){filepath=file};
+        gPath = "";
+        function MyFileTree() {
+            $("#filetree").fileTree({
+            root: "/Users/tiddy/Documents/git/Taiji/flask_filetree/rule",
+            script: "{{ url_for('filetree.sfiles') }}"
+            }, function(file) {
+                //alert(file);
+                // $.post("{{ url_for('filetree.getpath') }}", 
+                //     {
+                //         'filename' : file
+                //     }, 
+                //     function(data, status){
+                //         $(".editor").text("Editing file " + data);
+                //         gPath = data;
+                //     });
+                
+                $.post("{{ url_for('filetree.loadfile') }}", 
+                    {
+                        'filename' : file
+                    }, 
+                    function(data, status){
+                        $("#content").text(data);
+                        editor.getDoc().setValue(data);
+                        editor.refresh();
+                    });
+                setfilepath(file); 
+                });
+                
+            }
+
+        function initAll(){
+            myTextarea = document.getElementById("content");
+            editor = CodeMirror.fromTextArea(myTextarea);
+            MyFileTree();
+        }
+        $(document).ready(initAll);
+
         function addfile()
         {
           if(!filepath){
-            alert("no defined way"); 
+            alert("No path selected"); 
             return
             }
           var filename=prompt("filename","newfile.js")
@@ -42,7 +80,7 @@
         function addfolder() 
         {
           if(!filepath){
-            alert("no defined way"); 
+            alert("No path selected"); 
             return
             }
           var filename=prompt("foldername","newfolder")
@@ -62,6 +100,18 @@
                 window.location.href="/filetree/deletefile?path="+filepath
         };
 
+        function saveFile () {
+            text = editor.getDoc().getValue();
+            $.post("{{ url_for('filetree.savefile') }}", 
+                    {
+                        'filename' : filepath,
+                        'content' : text
+                    }, 
+                    function(data, status){
+                        alert(data);
+                    });
+        }
+
         $(function() {
             $("#filetree").fileTree({
                 root: "/Users/tiddy/Documents/git/Taiji/flask_filetree/rule",
@@ -70,28 +120,74 @@
             }, function(file) { setfilepath(file)});
         });
     </script>
+
+<style type="text/css">
+.button {
+    display: inline-block;
+    outline: none;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    font: 14px/100% Arial, Helvetica, sans-serif;
+    padding: .5em 2em .55em;
+    text-shadow: 0 1px 1px rgba(0,0,0,.3);
+    -webkit-border-radius: .5em; 
+    -moz-border-radius: .5em;
+    border-radius: .5em;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+.button:hover {
+    text-decoration: none;
+}
+.button:active {
+    position: relative;
+    top: 1px;
+}
+
+.orange {
+    color: #fef4e9;
+    border: solid 1px #da7c0c;
+    background: #f78d1d;
+    background: -webkit-gradient(linear, left top, left bottom, from(#faa51a), to(#f47a20));
+    background: -moz-linear-gradient(top,  #faa51a,  #f47a20);
+}
+.orange:hover {
+    background: #f47c20;
+    background: -webkit-gradient(linear, left top, left bottom, from(#f88e11), to(#f06015));
+    background: -moz-linear-gradient(top,  #f88e11,  #f06015);
+}
+.orange:active {
+    color: #fcd3a5;
+    background: -webkit-gradient(linear, left top, left bottom, from(#f47a20), to(#faa51a));
+    background: -moz-linear-gradient(top,  #f47a20,  #faa51a);
+}
+
+
+
+</style>
+
+
 </head>
 <body>
     <div class="container">
         <div class="row">
             <div class="twelve columns">
-                <h1 class="title"><b>jQueryFileTree Demo</b></h1>
+                <h1 class="title"><b>Welcome to Rules Engine Manager System!</b></h1>
             </div>
         </div>
 
         <div class="row">
             <div class="six columns offset-by-two">
-                <h4>Example Use Cases</h4>
-                <p>These are some pretty straightforward examples of what you can do with jQueryFileTree</p>
+                <h4>Quick start and easy use</h4>
+                <p>These are some pretty straightforward examples of what you can do with Rules Engine Manager System</p>
             </div>
             <div class="four columns">
                 <ul>
                     <li><a href="#basic-file-tree">Basic File Tree</a></li>
                     <li><a href="#without-multifolder">Without <b>multiFolder</b></a></li>
                     <li><a href="#folders-only">Folders Only</a></li>
-                    <li><a href="#custom-easing">Custom Easing</a></li>
-                    <li><a href="#multiselect">Multiselect</a></li>
-                    <li><a href="#events">Events</a></li>
                 </ul>
             </div>
         </div>
@@ -99,55 +195,31 @@
         <!-- BASIC FILE TREE -->
         <div class="row" id="basic-file-tree">
             <div class="four columns offset-by-one filetree-block">
+                <div class="filetree-title">File in local machine:</div>
                 <div class="filetree-basic">
                     <div id="filetree">
                     </div>
                 </div>
                 <div class="filetree-multiFolder-off"></div>
             </div>
-            <div class="six columns info-block">
-                <div><button onclick="addfile()">New file</button><div><button onclick="addfolder()">New folder</button><button>Save</button><button onclick="deletefile(filepath)">delete</button> </div>
+            <div class="seven columns info-block">
                 <div>
-                    <h4>Basic File Tree</h4>
+                    <button onclick="addfile()" class="button orange">New file</button>
+                    <button onclick="addfolder()" class="button orange">New folder</button>
+                    <button onclick="saveFile()" class="button orange">Save</button>
+                    <button onclick="deletefile(filepath)" class="button orange">delete</button>
                 </div>
 
-                    <pre><textarea id="myTextArea">
-
-
-
-var RuleEngine = require('../index');
-/* Sample Rule to block a transaction if its below 500 */
-var rule = {
-    "condition": function(R) {
-        R.when(this.transactionTotal < 500);
-    },
-    "consequence": function(R) {
-        this.result = false;
-        this.reason = "The transaction was blocked as it was less than 500";
-        R.stop();
-    }
-};
-/* Creating Rule Engine instance and registering rule */
-var R = new RuleEngine();
-R.register(rule);
-/* Fact with less than 500 as transaction, and this should be blocked */
-var fact = {
-    "name": "user4",
-    "application": "MOB2",
-    "transactionTotal": 400,
-    "cardType": "Credit Card"
-};
-R.execute(fact, function(data) {
-    if (data.result) {
-        console.log("Valid transaction");
-    } else {
-        console.log("Blocked Reason:" + data.reason);
-    }
-});
-
-
-
-                    </textarea></pre>
+                    <div>
+                        <h4>Basic File Tree</h4>
+                    </div>
+            <div style="width: 80%; height:80%">
+                    <pre>
+                        <textarea class="javascript hljs" id="content" style="height:247px;width:534px">
+Please click the file you want...
+                        </textarea>
+                    </pre>
+            </div>
                 </div>
             </div>
         </div>
@@ -156,7 +228,7 @@ R.execute(fact, function(data) {
  //   {
  //       document.getElemengtById("highlight").get
  //   }
-var myCodeMirror = CodeMirror.fromTextArea(myTextArea);
+// var myCodeMirror = CodeMirror.fromTextArea(content);
 </script>
 </div>
 </body>
