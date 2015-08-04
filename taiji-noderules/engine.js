@@ -57,13 +57,18 @@ for(var i = 0; i < res.length; i++){
       var time = pointStart + pointInterval * j;
       var name = "";
       var type = "";
+      var index = "";
       if(file_name.indexOf('cpu')>=0){
-         type = "cpu";
+           type = "cpu";
+         if(file_name.indexOf('1')>=0)
+            index = "2";
+         else
+            index = "1";
          if(file_name.indexOf('util')>=0)
 	    name = "util_time"
          else
             name = "process_time"
-         facts[j] = '{"level": 0, "type": "' + type  + '","name": "' + name + '","time": "' + time + '","useage": "' + data[j] + '%"}';
+         facts[j] = '{"level": 0, "type": "' + type  + '","name": "' + name + '","time": "' + time + '","useage": "' + data[j] + '%", "index":"'+ index + '"}';
       }
       else if(file_name.indexOf('memory')>=0){
          type = "memory";
@@ -97,7 +102,9 @@ for(var i = 0; i < res.length; i++){
                if(result.result<=2){
                   //console.log(result);
 		  result["level"] = result["result"];
+                  result["type"] += result.index 
                   delete result["result"];
+                  delete result["index"];
                   var output = JSON.stringify(result);
                   output += ',';
                   console.log(result);
