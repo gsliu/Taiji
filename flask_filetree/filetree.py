@@ -108,6 +108,8 @@ def make_blueprint(app=None, register=True, fnfilter=None, dfilter=None):
     @filetree.route('/loadfile', methods=['POST'])
     def loadfile():
         filename = flask.request.form.get('filename')
+        if os.path.isdir(filename):
+            return ""
         content = get_file_content(filename)
         return '\n'.join(content)
 

@@ -123,6 +123,16 @@
             $(this).parent().find('UL').remove();
             _this.showTree($(this).parent(), $(this).attr('rel').match(relPattern)[0]);
             _this._trigger($(this), 'filetreeexpanded', data);
+
+
+
+            jqft.container.find('li').removeClass('selected');
+            $(this).parent().addClass('selected');
+            if (typeof callback === "function") {
+            callback($(this).attr('rel'));
+          }
+
+
           } else {
             _this._trigger($(this), 'filetreecollapse', data);
             $(this).parent().find('UL').slideUp({
