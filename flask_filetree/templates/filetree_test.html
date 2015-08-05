@@ -12,35 +12,24 @@
     <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/atelier-cave.light.min.css') }}"></link>
     <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/prettify.css') }}"></link>
     <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/codemirror.css') }}"></link>
-<!--    <link rel="stylesheet" href="{{ url_for('filetree.static', filename='css/styles/default.css') }}"></link> -->   
     <script src="{{ url_for('filetree.static', filename='js/highlight.min.js') }}"></script>
     <script src="{{ url_for('filetree.static', filename='js/run_prettify.js') }}"></script>
     <script src="{{ url_for('filetree.static', filename='js/codemirror.js') }}"></script>
     <script src="{{ url_for('filetree.static', filename='js/javascript.js') }}"></script>
 
-    <style>
-    </style>
     <script>
-        // CodeMirror.fromTextArea($("#content"));
         var editor;
         var filepath;
-        function setfilepath(file){filepath=file};
-        gPath = "";
+
+        function setfilepath(file){
+            filepath=file
+        };
+
         function MyFileTree() {
             $("#filetree").fileTree({
-            root: "/Users/tiddy/Documents/git/Taiji/flask_filetree/rule",
-            script: "{{ url_for('filetree.sfiles') }}"
+                root: "/home/chuanl/code/bootcamp/Taiji/taiji-noderules",
+                script: "{{ url_for('filetree.sfiles') }}"
             }, function(file) {
-                //alert(file);
-                // $.post("{{ url_for('filetree.getpath') }}", 
-                //     {
-                //         'filename' : file
-                //     }, 
-                //     function(data, status){
-                //         $(".editor").text("Editing file " + data);
-                //         gPath = data;
-                //     });
-                
                 $.post("{{ url_for('filetree.loadfile') }}", 
                     {
                         'filename' : file
@@ -52,7 +41,6 @@
                     });
                 setfilepath(file); 
                 });
-                
             }
 
         function initAll(){
@@ -60,6 +48,7 @@
             editor = CodeMirror.fromTextArea(myTextarea);
             MyFileTree();
         }
+
         $(document).ready(initAll);
 
         function addfile()
@@ -117,11 +106,17 @@
                 root: "/Users/tiddy/Documents/git/Taiji/flask_filetree/rule",
                 script: "{{ url_for('filetree.sfiles') }}",
                 folderEvent: "click"
-            }, function(file) { setfilepath(file)});
+            }, function(file) { 
+                setfilepath(file)
+            });
         });
     </script>
 
 <style type="text/css">
+.filetree-title{
+    font-size: x-large;
+}
+
 .button {
     display: inline-block;
     outline: none;
@@ -164,8 +159,6 @@
     background: -moz-linear-gradient(top,  #f47a20,  #faa51a);
 }
 
-
-
 </style>
 
 
@@ -174,35 +167,25 @@
     <div class="container">
         <div class="row">
             <div class="twelve columns">
-
-
-                <h1 class="title"><b>Welcome to Rules Engine Manager System!</b></h1>
+                <h1 class="title"><b>Rules Engine Manager System</b></h1>
             </div>
         </div>
 
         <div class="row">
-            <div class="six columns offset-by-two">
+            <div class="ten columns ">
                 <h4>Quick start and easy use</h4>
                 <p>These are some pretty straightforward examples of what you can do with Rules Engine Manager System</p>
-            </div>
-            <div class="four columns">
-                <ul>
-                    <li><a href="#basic-file-tree">Basic File Tree</a></li>
-                    <li><a href="#without-multifolder">Without <b>multiFolder</b></a></li>
-                    <li><a href="#folders-only">Folders Only</a></li>
-                </ul>
             </div>
         </div>
 
         <!-- BASIC FILE TREE -->
         <div class="row" id="basic-file-tree">
             <div class="four columns offset-by-one filetree-block">
-                <div class="filetree-title">File in local machine:</div>
+                <div class="filetree-title">Rules Files:</div>
                 <div class="filetree-basic">
                     <div id="filetree">
                     </div>
                 </div>
-                <div class="filetree-multiFolder-off"></div>
             </div>
             <div class="seven columns info-block">
                 <div>
@@ -212,26 +195,18 @@
                     <button onclick="deletefile(filepath)" class="button orange">delete</button>
                 </div>
 
-                    <div>
-                        <h4>Basic File Tree</h4>
-                    </div>
-            <div style="width: 80%; height:80%">
+                <div>
+                    <h4>Content</h4>
+                </div>
+                <div style="width: 90%; height:100%">
                     <pre>
                         <textarea class="javascript hljs" id="content" style="height:247px;width:534px">
 Please click the file you want...
                         </textarea>
                     </pre>
-            </div>
                 </div>
             </div>
         </div>
-    <script type="text/javascript">
- //   function settextarea()
- //   {
- //       document.getElemengtById("highlight").get
- //   }
-// var myCodeMirror = CodeMirror.fromTextArea(content);
-</script>
-</div>
+    </div>
 </body>
 </html>
